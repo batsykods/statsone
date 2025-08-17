@@ -36,7 +36,7 @@ export default function DashboardPage() {
     if (source) queryParams.append('source', source);
     if (minRecords) queryParams.append('min_records', minRecords);
 
-    const url = `http://localhost:8000/datasets/?${queryParams.toString()}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/datasets/?${queryParams.toString()}`;;
 
     try {
       const response = await fetch(url, {

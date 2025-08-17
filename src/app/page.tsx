@@ -13,7 +13,7 @@ export default function LoginPage() {
     setError('');
 
     // Your backend is running on port 8000
-    const backendUrl = 'http://localhost:8000/token';
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_URL}/token`;;
 
     try {
       const response = await fetch(backendUrl, {
