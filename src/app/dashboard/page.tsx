@@ -52,7 +52,7 @@ export default function DashboardPage() {
       const data: Dataset[] = await response.json();
       setDatasets(data);
     } catch (err) {
-        // --- THIS IS THE FIX ---
+        // --- THIS BLOCK IS THE FIX ---
         if (err instanceof Error) {
             setError(err.message);
         } else {
