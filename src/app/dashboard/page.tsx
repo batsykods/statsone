@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Papa from 'papaparse'; // <-- NEW: Import PapaParse
+import Papa from 'papaparse';
 
 type Dataset = {
   id: number;
@@ -36,7 +36,7 @@ export default function DashboardPage() {
     if (source) queryParams.append('source', source);
     if (minRecords) queryParams.append('min_records', minRecords);
 
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/datasets/?${queryParams.toString()}`;;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/datasets/?${queryParams.toString()}`;
 
     try {
       const response = await fetch(url, {
@@ -51,9 +51,14 @@ export default function DashboardPage() {
 
       const data: Dataset[] = await response.json();
       setDatasets(data);
-    } catch (err: any) {
-      setError(err.message);
-      setDatasets([]);
+    } catch (err) {
+        // --- THIS IS THE FIX ---
+        if (err instanceof Error) {
+            setError(err.message);
+        } else {
+            setError('An unexpected error occurred.');
+        }
+        setDatasets([]);
     } finally {
       setIsLoading(false);
     }
@@ -64,16 +69,12 @@ export default function DashboardPage() {
     fetchDatasets(sourceFilter, minRecordsFilter);
   };
   
-  // --- NEW: Function to handle the CSV export ---
   const handleExport = () => {
     if (datasets.length === 0) {
       alert("No data to export!");
       return;
     }
-    // Convert the JSON data to a CSV string
     const csv = Papa.unparse(datasets);
-
-    // Create a blob and trigger a download
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -104,7 +105,6 @@ export default function DashboardPage() {
 
         <div className="mb-6 rounded-lg bg-white p-4 shadow">
           <form onSubmit={handleFilterSubmit} className="flex items-end space-x-4">
-            {/* Filter Inputs */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Source (State)</label>
               <input
@@ -125,14 +125,12 @@ export default function DashboardPage() {
                 placeholder="e.g., 1000"
               />
             </div>
-            {/* Filter Button */}
             <button
               type="submit"
               className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
               Apply Filters
             </button>
-            {/* --- NEW: Export Button --- */}
             <button
               type="button"
               onClick={handleExport}
@@ -148,7 +146,6 @@ export default function DashboardPage() {
 
         {!isLoading && !error && (
           <div className="overflow-hidden rounded-lg bg-white shadow">
-            {/* Data Table */}
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
